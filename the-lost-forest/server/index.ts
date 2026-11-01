@@ -19,12 +19,23 @@ app.use((req,res,next)=>{
 });
 setInterval(()=>{for(const[k,v]of rates)if(Date.now()-v.t>120000)rates.delete(k);},60000).unref();
 app.get('/api/health',(_req,res)=>res.json({ok:true,game:'THE LOST FOREST',version:'0.1.0',durableCheckpoints:!!process.env.DATABASE_URL,persistenceHealthy}));
-const restoring=new Map<string,Promise<string>>();
+const restoring=new Map<string,Promise<string|null>>();
 app.post('/api/rooms/:code/resolve',async(req,res)=>{
- const code=String(req.params.code).toUpperCase();if(!/^[A-F0-9]{6}$/.test(code)){res.status(404).json({error:'Room not found'});return;}
- try{const active=await matchMaker.getRoomById(code);if(active){res.json({roomId:active.roomId});return;}
- let task=restoring.get(code);if(!task){task=(async()=>{const game=await loadCheckpoint(code);if(!game||game.finished)throw Error('Room unavailable');const result=await matchMaker.createRoom('forest',{resumeTicket:issueResume(game)});return result.roomId;})();restoring.set(code,task);task.finally(()=>restoring.delete(code)).catch(()=>{});}
- res.json({roomId:await task});}catch{res.status(404).json({error:'Room unavailable'});}
+ const code=String(req.params.code).replace(/\s+/g,'').toUpperCase();
+ res.setHeader('Cache-Control','no-store');
+ if(!/^[A-F0-9]{6}$/.test(code)){res.status(400).json({code:'INVALID_ROOM_CODE',message:'Enter the six-character code shown in the host’s game.'});return;}
+ try{
+  const active=await matchMaker.getRoomById(code);
+  if(active){
+   if(active.clients>=active.maxClients){res.status(409).json({code:'ROOM_FULL',message:'All 8 places are occupied or reserved for reconnecting explorers. Try again shortly.'});return;}
+   res.json({roomId:active.roomId,capacity:active.maxClients,players:active.clients});return;
+  }
+  let task=restoring.get(code);
+  if(!task){task=(async()=>{const game=await loadCheckpoint(code);if(!game||game.finished)return null;const result=await matchMaker.createRoom('forest',{resumeTicket:issueResume(game)});return result.roomId;})();restoring.set(code,task);task.finally(()=>restoring.delete(code)).catch(()=>{});}
+  const roomId=await task;
+  if(!roomId){res.status(404).json({code:'ROOM_NOT_FOUND',message:'That room has ended or its code is no longer active. Ask the host for the current room code.'});return;}
+  res.json({roomId,capacity:8});
+ }catch(e){console.error('Room resolution failed:',e instanceof Error?e.message:'unknown error');res.status(503).json({code:'SERVER_UNAVAILABLE',message:'The forest server is temporarily unavailable. Wait a moment and try again.'});}
 });
 setInterval(()=>{void cleanupCheckpoints().catch(()=>{});},3600000).unref();
 app.use(express.static('dist'));

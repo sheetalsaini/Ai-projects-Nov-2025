@@ -66,3 +66,8 @@ A complete live five-chapter playthrough passed using only normal input and inte
 Eight local automated tests pass. Run the live checks with FOREST_TEST_URL set to the actual backend origin. The optional --use-env-proxy Node flag is appropriate only in environments that require their configured outbound proxy.
 
 Restart-safe Postgres checkpoints are not yet wired in production. The free checkpoint database exists, but DATABASE_URL still needs to be supplied through Render configuration after the owner completes dashboard authentication. Temporary disconnect and browser-reload recovery work while the room server remains alive.
+
+## Cross-device and invite hotfix
+A solo start now permits invited friends through the same room code, with an eight-player capacity. Previously solo rooms were locked to one player while still displaying a shareable code. Joining now distinguishes invalid, full, expired and temporarily unavailable rooms.
+
+The device selector defaults to Auto and remembers optional Phone, iPad/Tablet or Laptop/Desktop choices. The screen-controls button changes layouts without leaving the room. Touch controls have independent pointer capture for concurrent movement and jumping. Inputs use 16px fonts in touch layouts to prevent Safari focus zoom; the viewport and camera fit dynamic phone heights. Portrait phones show a landscape recommendation. Every layout connects to the same Render backend.

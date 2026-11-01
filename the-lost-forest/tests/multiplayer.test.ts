@@ -5,7 +5,7 @@ import {Client,type Room} from '@colyseus/sdk';
 import type {GameState} from '../shared/world.js';
 const delay=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 async function until(fn:()=>boolean,timeout=6000){const start=Date.now();while(!fn()){if(Date.now()-start>timeout)throw Error('Timed out waiting for synchronized state');await delay(30);}}
-test('two real clients: private code, movement, jumping, shared pickup, reconnect, invalid code',async()=>{
+for(const solo of [false,true])test(`${solo?'solo-started':'multiplayer-started'} room: independent joining, movement, jumping, collection and reconnect`,async()=>{
  const port=28000+Math.floor(Math.random()*1000);
  const remote=process.env.FOREST_TEST_URL;
  const child=remote?undefined:spawn(process.execPath,['build/server/index.js'],{env:{...process.env,PORT:String(port),NODE_ENV:'test'},stdio:['ignore','pipe','pipe']});let output='';child?.stdout.on('data',x=>output+=x);child?.stderr.on('data',x=>output+=x);
@@ -14,8 +14,9 @@ test('two real clients: private code, movement, jumping, shared pickup, reconnec
   if(child)await until(()=>output.includes('Forest server listening'));
   const base=remote||`http://127.0.0.1:${port}`;
   const c1=new Client(base),c2=new Client(base);
-  const a=await c1.create('forest',{nickname:'Oak'});rooms.push(a);let sa:GameState|undefined;a.onMessage('snapshot',(s:GameState)=>sa=s);a.onMessage('chat',()=>{});a.onMessage('notice',()=>{});
-  const b=await c2.joinById(a.roomId,{nickname:'Fern'});rooms.push(b);let sb:GameState|undefined;b.onMessage('snapshot',(s:GameState)=>sb=s);b.onMessage('chat',()=>{});b.onMessage('notice',()=>{});
+  const a=await c1.create('forest',{nickname:'Oak',solo});rooms.push(a);let sa:GameState|undefined;a.onMessage('snapshot',(s:GameState)=>sa=s);a.onMessage('chat',()=>{});a.onMessage('notice',()=>{});
+  const resolved=await fetch(`${base}/api/rooms/${a.roomId}/resolve`,{method:'POST'});assert.equal(resolved.status,200);const target=await resolved.json() as {roomId:string;capacity:number};assert.equal(target.capacity,8);
+  const b=await c2.joinById(target.roomId,{nickname:'Fern'});rooms.push(b);let sb:GameState|undefined;b.onMessage('snapshot',(s:GameState)=>sb=s);b.onMessage('chat',()=>{});b.onMessage('notice',()=>{});
   await until(()=>!!sa&&!!sb&&Object.keys(sa.players).length===2&&Object.keys(sb.players).length===2);
   assert.match(a.roomId,/^[A-F0-9]{6}$/);
   a.send('input',{left:false,right:true,jump:false,hide:false,seq:1});

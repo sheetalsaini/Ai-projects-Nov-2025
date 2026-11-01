@@ -5,3 +5,95 @@
 @media(max-width:700px){#topbar{padding:15px 5%;height:65px}.brand{font-size:10px;letter-spacing:1.6px;gap:6px}.brand-icon{font-size:22px}.pill{font-size:7px;letter-spacing:1px;padding:7px 8px}.top-actions{gap:5px}.icon-button{width:29px;height:29px}#landing{left:7%;width:86%;top:90px;transform:none;max-height:calc(100dvh - 105px)}#landing .eyebrow{font-size:8px;letter-spacing:1.6px}h1{font-size:72px;margin:25px 0 20px;letter-spacing:-3px}.tagline{font-size:16px}.intro{font-size:11px;margin-bottom:18px}.entry-card{width:100%;max-width:400px;padding:17px}.landing-footer{width:100%;max-width:400px;margin-top:15px;font-size:8px}#vignette{background:linear-gradient(90deg,#041a17e6,#041a1740),linear-gradient(0deg,#041a17ba,transparent)}#hud{top:80px;left:5%;right:5%;gap:12px;flex-wrap:wrap}.chapter-box{min-width:130px}.chapter-box h2{font-size:23px}.chapter-box .eyebrow{font-size:8px}#roomInfo{position:absolute;right:0;top:0;max-width:170px;padding:7px 9px}#copyCode{font-size:12px;letter-spacing:1.5px}#players{font-size:8px;gap:3px 6px;max-height:35px;overflow:auto}.objective-box{width:100%;max-width:none;padding:10px 12px;margin-top:5px}#objective{font-size:10px;margin:5px 0 8px}.small-label{font-size:8px}#inventory{padding-top:8px;gap:18px;font-size:12px}.shared{margin-left:auto}#notice{top:265px;width:90%;max-width:90%;font-size:11px;padding:10px 15px}#keyboardHint{display:none!important}#social{bottom:100px;right:5%;gap:7px}#reactions button{height:30px;width:30px;font-size:15px}#chatToggle{padding:7px 11px;font-size:10px}#chatPanel{width:280px}#context{bottom:154px;font-size:11px;max-width:85%;white-space:nowrap}.modal-card{padding:24px}.modal-card h2{font-size:29px}.modal-card .quote{font-size:16px}#touchControls{left:15px;right:15px}#touchControls>div{gap:7px}#touchControls button{width:48px;height:48px;font-size:12px}#touchControls #touchInteract{width:56px;height:56px}}
 @media(max-height:520px){#hud{top:70px;flex-wrap:nowrap}.chapter-box{min-width:130px}.chapter-box h2{font-size:20px}.objective-box{max-width:320px}#roomInfo{max-width:170px}#notice{top:195px;padding:7px 14px}#social{bottom:88px}#context{bottom:100px}#touchControls button{width:45px;height:45px}#landing{top:75px;left:5%;width:90%;display:grid;grid-template-columns:1fr 340px;column-gap:20px;transform:none;max-height:calc(100dvh - 80px)}#landing .eyebrow{grid-column:1;font-size:7px}h1{font-size:55px;margin:18px 0}.tagline{font-size:13px}.intro{font-size:10px;margin:8px 0}.entry-card{grid-column:2;grid-row:1/6;width:340px;padding:13px}.landing-footer{display:none}.entry-card input{padding:9px}.primary,.secondary{min-height:35px;padding:9px 12px}.divider{margin:12px 0 7px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Fit the game to the visible mobile screen. Inputs stay at 16px to prevent iOS focus zoom. */
+html{height:100%;width:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior:none}
+body,#app{width:100%;height:100%;height:100dvh;max-width:100%;overflow:hidden;overscroll-behavior:none}
+body{position:fixed;inset:0}
+#world{width:100%;height:100%;height:100dvh;touch-action:none}
+#world canvas{touch-action:none}
+.device-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+select{font:inherit;font-size:16px;color:#e9efdf;background:#12372b;border:1px solid #9dbb9c66;border-radius:5px;padding:8px;max-width:100%;min-width:0}
+.device-row select{max-width:205px;flex:1}
+.modal-card select{display:block;width:100%;margin-top:10px;min-height:44px}
+:root[data-controls="touch"] #keyboardHint{display:none!important}
+:root[data-controls="keyboard"] #touchControls{display:none!important}
+:root[data-controls="touch"] input,:root[data-controls="touch"] select,:root[data-controls="touch"] textarea{font-size:16px!important}
+:root[data-controls="touch"] #topbar{padding-top:max(12px,env(safe-area-inset-top));padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));gap:8px}
+:root[data-controls="touch"] #network{max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root[data-device="phone"] #topbar{height:calc(58px + env(safe-area-inset-top));padding-bottom:10px}
+:root[data-device="phone"] .brand{font-size:9px;letter-spacing:1.2px;gap:5px;white-space:nowrap}
+:root[data-device="phone"] .brand-icon{font-size:20px}
+:root[data-device="phone"] .top-actions{gap:5px}
+:root[data-device="phone"] .icon-button{width:29px;height:29px;flex-shrink:0}
+:root[data-device="phone"] #network{font-size:7px;padding:6px;letter-spacing:.6px;max-width:70px}
+:root[data-device="phone"] #landing{display:block;left:5%;width:90%;top:calc(78px + env(safe-area-inset-top));transform:none;max-height:calc(100dvh - 92px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow-y:auto;overflow-x:hidden;touch-action:pan-y;padding-bottom:12px}
+:root[data-device="phone"] #landing .eyebrow{font-size:8px;letter-spacing:1.4px}
+:root[data-device="phone"] h1{font-size:clamp(50px,17vw,72px);margin:22px 0 18px;letter-spacing:-2px}
+:root[data-device="phone"] .tagline{font-size:15px}
+:root[data-device="phone"] .intro{font-size:11px;margin-bottom:16px}
+:root[data-device="phone"] .entry-card,:root[data-device="phone"] .landing-footer{width:100%;max-width:420px}
+:root[data-device="phone"] .entry-card{padding:16px}
+:root[data-device="phone"] .device-row{gap:8px;margin-bottom:12px}
+:root[data-device="phone"] .device-row select{max-width:200px}
+:root[data-device="phone"] #hud{position:fixed;top:calc(72px + env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));display:grid;grid-template-columns:minmax(0,1fr) 142px;gap:9px;align-items:start}
+:root[data-device="phone"] .chapter-box{grid-column:1;grid-row:1;min-width:0;max-width:100%}
+:root[data-device="phone"] .chapter-box h2{font-size:21px;margin:6px 0 8px;line-height:1.1}
+:root[data-device="phone"] .chapter-box .eyebrow{font-size:8px;letter-spacing:1.5px}
+:root[data-device="phone"] #chapterDots span{width:20px}
+:root[data-device="phone"] #roomInfo{grid-column:2;grid-row:1;position:static;width:142px;max-width:142px;margin:0;padding:7px 8px}
+:root[data-device="phone"] #copyCode{font-size:12px;letter-spacing:1px;padding:3px}
+:root[data-device="phone"] #players{font-size:9px;gap:3px 6px;max-height:28px;overflow:auto}
+:root[data-device="phone"] .objective-box{grid-column:1/-1;grid-row:2;width:100%;max-width:100%;min-width:0;margin:0;padding:9px 12px}
+:root[data-device="phone"] #objective{font-size:11px;line-height:1.4;margin:5px 0 7px;overflow-wrap:anywhere}
+:root[data-device="phone"] #inventory{gap:16px;padding-top:7px;font-size:12px}
+:root[data-device="phone"] #inventory .shared{font-size:7px;letter-spacing:1px;margin-left:auto}
+:root[data-device="phone"] #notice{top:calc(250px + env(safe-area-inset-top));font-size:11px;width:calc(100% - 28px);max-width:calc(100% - 28px);padding:9px 12px;border-radius:10px}
+:root[data-controls="touch"] #touchControls{left:max(14px,env(safe-area-inset-left));right:max(14px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));gap:12px}
+:root[data-controls="touch"] #touchControls>div{gap:8px}
+:root[data-controls="touch"] #touchControls button{width:52px;height:52px;font-size:12px;flex-shrink:0}
+:root[data-controls="touch"] #touchControls #touchInteract{width:62px;height:62px;font-size:14px}
+:root[data-controls="touch"] #social{right:max(14px,env(safe-area-inset-right));bottom:calc(92px + env(safe-area-inset-bottom));gap:6px}
+:root[data-device="phone"] #reactions button{width:29px;height:29px;font-size:15px}
+:root[data-device="phone"] #chatToggle{padding:7px 10px;font-size:10px}
+:root[data-device="phone"] #chatPanel{width:min(290px,calc(100vw - 28px));max-width:calc(100vw - 28px)}
+:root[data-controls="touch"] #context{bottom:calc(140px + env(safe-area-inset-bottom));max-width:calc(100% - 24px);font-size:11px;white-space:normal;text-align:center}
+:root[data-controls="touch"] .modal-card{max-height:calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));padding:22px;overflow:auto}
+:root[data-device="tablet"] #hud{top:calc(90px + env(safe-area-inset-top));gap:14px;left:3%;right:3%}
+:root[data-device="tablet"] .objective-box{max-width:420px;min-width:0}
+:root[data-device="tablet"] #landing{max-height:calc(100dvh - 110px - env(safe-area-inset-top));overflow:auto}
+@media(max-width:360px){:root[data-device="phone"] #network{display:none}:root[data-controls="touch"] #touchControls button{width:46px;height:46px}:root[data-controls="touch"] #touchControls #touchInteract{width:54px;height:54px}}
+@media(max-height:520px){
+ :root[data-controls="touch"] #topbar{height:44px;padding-top:6px;padding-bottom:6px}
+ :root[data-controls="touch"] .brand{font-size:9px;letter-spacing:1.1px}
+ :root[data-controls="touch"] #hud{display:grid;grid-template-columns:110px minmax(0,1fr) 142px;top:51px;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));gap:10px;align-items:start}
+ :root[data-controls="touch"] .chapter-box{grid-column:1;grid-row:1;min-width:0}
+ :root[data-controls="touch"] .chapter-box h2{font-size:17px;margin:4px 0 6px}
+ :root[data-controls="touch"] .chapter-box .eyebrow{font-size:7px;letter-spacing:1px}
+ :root[data-controls="touch"] #chapterDots span{width:16px}
+ :root[data-controls="touch"] .objective-box{grid-column:2;grid-row:1;margin:0;width:100%;max-width:none;padding:7px 10px}
+ :root[data-controls="touch"] #objective{font-size:10px;line-height:1.35;margin:4px 0 5px}
+ :root[data-controls="touch"] #inventory{padding-top:5px;font-size:11px;gap:13px}
+ :root[data-controls="touch"] #inventory .shared{display:none}
+ :root[data-controls="touch"] #roomInfo{position:static;grid-column:3;grid-row:1;margin:0;width:142px;max-width:142px;padding:7px}
+ :root[data-controls="touch"] #notice{top:150px;padding:7px 12px;font-size:10px;max-width:80%;width:auto}
+ :root[data-controls="touch"] #touchControls{bottom:max(12px,env(safe-area-inset-bottom))}
+ :root[data-controls="touch"] #social{bottom:76px}
+ :root[data-controls="touch"] #context{bottom:115px}
+ :root[data-controls="touch"] #landing{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,340px);gap:0 18px;left:4%;width:92%;top:58px;transform:none;max-height:calc(100dvh - 65px);overflow:auto}
+ :root[data-controls="touch"] #landing .eyebrow{grid-column:1;font-size:7px;letter-spacing:1px}
+ :root[data-controls="touch"] h1{grid-column:1;font-size:clamp(32px,6.5vw,55px);margin:12px 0}
+ :root[data-controls="touch"] .tagline{grid-column:1;font-size:12px}
+ :root[data-controls="touch"] .intro{display:none}
+ :root[data-controls="touch"] .entry-card{grid-column:2;grid-row:1/6;width:100%;padding:10px;align-self:start}
+ :root[data-controls="touch"] .device-row{margin-bottom:7px}
+ :root[data-controls="touch"] .device-row select{padding:5px}
+ :root[data-controls="touch"] .entry-card input{padding:8px}
+ :root[data-controls="touch"] .divider{margin:8px 0 5px}
+ :root[data-controls="touch"] .landing-footer{display:none}
+}
+#rotateHint{position:fixed;z-index:5;top:calc(61px + env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));padding:7px 9px;border:1px solid #d7bd7a55;border-radius:6px;background:#12372bf2;color:#e4d5aa;font-size:10px;line-height:1.3;text-align:center;pointer-events:none}
+:root[data-controls="touch"] #touchControls .directions button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+:root[data-controls="touch"] #touchControls .directions button span{font-size:17px;line-height:1}
+:root[data-controls="touch"] #touchControls .directions button small{font-size:9px;line-height:1}
+@media(orientation:portrait){:root[data-device="phone"] #hud{top:calc(108px + env(safe-area-inset-top))}:root[data-device="phone"] #notice{top:calc(285px + env(safe-area-inset-top))}}

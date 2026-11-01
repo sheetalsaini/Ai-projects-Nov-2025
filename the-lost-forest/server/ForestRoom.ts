@@ -12,7 +12,8 @@ export class ForestRoom extends Room {
  lastInputAt=new Map<string,number>();
  async onCreate(options:any){
   this.roomId=randomBytes(4).toString('hex').slice(0,6).toUpperCase();
-  this.maxClients=options.solo===true?1:8;
+  // A solo start is still an invite-only cooperative room. Sharing its code must work.
+  this.maxClients=8;
   const resumed=consumeResume(options.resumeTicket);
   this.game=resumed||createState(this.roomId);
   if(resumed){this.roomId=resumed.code;this.game.players={};this.game.campfire=false;this.game.phase='adventure';this.game.chaseStarted=false;this.game.chaseTime=0;this.game.creatureX=-450;}
