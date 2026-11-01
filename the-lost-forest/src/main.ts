@@ -24,6 +24,7 @@ const endpoint=(import.meta as any).env.VITE_SERVER_URL||localStorage.getItem('f
 const isLocal=['localhost','127.0.0.1'].includes(location.hostname)||location.hostname.includes('preview');
 let serverURL=endpoint||location.origin;
 const serverConfig=fetch('/server-config.json').then(r=>r.ok?r.json():null).then(c=>{if(c?.serverUrl&&/^https:\/\//.test(c.serverUrl))serverURL=c.serverUrl;}).catch(()=>{});
+function multiplayerClient(){return new Client(serverURL,{fetchFn:(url,init)=>fetch(url,{...init,credentials:'omit'})});}
 let gameScene:ForestScene;
 function tone(freq=440){if(!sound)return;audio ||=new AudioContext();void audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.connect(g);g.connect(audio.destination);o.frequency.value=freq;o.type='sine';g.gain.setValueAtTime(.035,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.22);o.start();o.stop(audio.currentTime+.23);}
 function notice(text:string){$('notice').textContent=text;$('notice').hidden=false;window.clearTimeout((notice as any).timer);(notice as any).timer=setTimeout(()=>$('notice').hidden=true,6500);}
@@ -41,7 +42,7 @@ async function connect(mode:'create'|'join'|'solo'){
  if(!serverURL){$('status').textContent='The multiplayer server is not connected yet. This build cannot start an adventure.';return;}
  const code=($('code') as HTMLInputElement).value.trim().toUpperCase();if(mode==='join'&&!/^[A-F0-9]{6}$/.test(code)){$('status').textContent='Enter the six-character room code.';return;}
  busy=true;document.querySelectorAll<HTMLButtonElement>('.entry-card button').forEach(b=>b.disabled=true);$('status').textContent='Finding a path into the forest… A sleeping free server may take a minute.';
- try{await serverConfig;const client=new Client(serverURL);if(mode==='join'){const r=await fetch(`${serverURL}/api/rooms/${code}/resolve`,{method:'POST'});if(!r.ok)throw Error('Room unavailable');}room=mode==='join'?await client.joinById(code,{nickname}):await client.create('forest',{nickname,solo:mode==='solo'});bindRoom(room);}
+ try{await serverConfig;const client=multiplayerClient();if(mode==='join'){const r=await fetch(`${serverURL}/api/rooms/${code}/resolve`,{method:'POST'});if(!r.ok)throw Error('Room unavailable');}room=mode==='join'?await client.joinById(code,{nickname}):await client.create('forest',{nickname,solo:mode==='solo'});bindRoom(room);}
  catch(e){$('status').textContent=mode==='join'?'That room is unavailable, full, or has ended. Check the code and try again.':'Could not reach the forest server. Please try again.';console.error(e);}
  finally{busy=false;document.querySelectorAll<HTMLButtonElement>('.entry-card button').forEach(b=>b.disabled=false);}
 }
@@ -54,7 +55,7 @@ function bindRoom(r:Room){
   state=s;const p=s.players[r.sessionId];if(p){pending=pending.filter(x=>x.input.seq>p.seq);me={...p};for(const x of pending)stepPlayer(me,x.input,x.dt,s.chapter,s.elapsed,s.built);}
   updateHUD();if(s.campfire&&$('modal').hidden)campfire();if(s.finished&&$('modal').hidden)ending();
  });
- r.onMessage('notice',(s:string)=>{notice(s);tone(520);});r.onMessage('chat',(m:any)=>chat(m.name,m.text));r.onMessage('puzzle',()=>puzzle());
+ r.onMessage('notice',(s:string)=>{notice(s);tone(520);});r.onMessage('chat',(m:any)=>{chat(m.name,m.text);const response=document.getElementById('pebbleResponse');if(response&&m.name==='Professor Pebble')response.textContent=m.text;});r.onMessage('puzzle',()=>puzzle());
  r.onDrop(()=>{$('reconnecting').hidden=false;$('network').textContent='RECONNECTING';clearInput();});
  r.onReconnect(()=>{$('reconnecting').hidden=true;$('network').textContent='● CONNECTED';sessionStorage.setItem('forest-token',r.reconnectionToken);pending=[];});
  r.onLeave(()=>{$('reconnecting').hidden=true;showModal('<div class="eyebrow">CONNECTION ENDED</div><h2>The trail is still here.</h2><p>Your reconnect window may have expired. Return to the trailhead and rejoin the group using their room code.</p><button id="returnHome" class="primary">Return to trailhead</button>');$('returnHome').onclick=()=>location.reload();});
@@ -66,7 +67,7 @@ function updateHUD(){if(!state)return;const c=CHAPTERS[state.chapter-1];$('dayLa
 $('copyCode').onclick=()=>{if(state)void navigator.clipboard?.writeText(state.code).then(()=>notice('Room code copied. Send it to your explorers.')).catch(()=>notice(`Your room code is ${state!.code}`));};
 function campfire(){
  const prompts=['What human invention would confuse a dinosaur the most?','If this forest had a delivery app, what would you order?','What is the least useful superpower for a jungle escape?','What would you name a creature that steals only left socks?'];
- showModal(`<div class="eyebrow">A MOMENT BY THE FIRE</div><div class="pebble">◉ ◡ ◉</div><h2>Professor Pebble<br>has questions.</h2><p class="quote">“${prompts[(state!.chapter-1)%4]}”</p><p>Share in camp chat, or keep your brilliant answer to yourself. Both are scientifically acceptable.</p><form id="campReply"><input id="campReplyText" maxlength="160" aria-label="Answer Professor Pebble" placeholder="Your entirely scientific answer…"><button class="secondary" type="submit">Share with the group</button></form><div class="camp-buttons"><button id="answerPebble" class="secondary">Absolutely ridiculous, professor</button><button id="trivia" class="secondary">Give us a trivia question</button></div><p id="triviaQuestion" hidden>What is a group of flamingos called? <button id="triviaReveal">Reveal the answer</button></p><button id="nextChapter" class="primary">Continue together → Day ${state!.chapter+1}</button><small>Any explorer can continue. Take a moment to check that everyone is ready.</small>`);
+ showModal(`<div class="eyebrow">A MOMENT BY THE FIRE</div><div class="pebble">◉ ◡ ◉</div><h2>Professor Pebble<br>has questions.</h2><p class="quote">“${prompts[(state!.chapter-1)%4]}”</p><p>Share in camp chat, or keep your brilliant answer to yourself. Both are scientifically acceptable.</p><form id="campReply"><input id="campReplyText" maxlength="160" aria-label="Answer Professor Pebble" placeholder="Your entirely scientific answer…"><button class="secondary" type="submit">Share with the group</button></form><div class="camp-buttons"><button id="answerPebble" class="secondary">Absolutely ridiculous, professor</button><button id="trivia" class="secondary">Give us a trivia question</button></div><p id="triviaQuestion" hidden>What is a group of flamingos called? <button id="triviaReveal">Reveal the answer</button></p><p id="pebbleResponse" aria-live="polite"></p><button id="nextChapter" class="primary">Continue together → Day ${state!.chapter+1}</button><small>Any explorer can continue. Take a moment to check that everyone is ready.</small>`);
  $('campReply').onsubmit=e=>{e.preventDefault();const i=$('campReplyText') as HTMLInputElement;if(i.value.trim()){send('chat',i.value);i.value='';notice('Your answer was shared in camp chat.');}};
  $('answerPebble').onclick=()=>{send('campAnswer','answer');chat('You','Absolutely ridiculous, professor.');tone(660);};$('trivia').onclick=()=>$('triviaQuestion').hidden=false;$('triviaReveal').onclick=()=>send('campAnswer','trivia');$('nextChapter').onclick=()=>send('continue');
 }
@@ -130,4 +131,4 @@ class ForestScene extends Phaser.Scene {
 }
 new Phaser.Game({type:Phaser.AUTO,parent:'world',backgroundColor:'#071d19',scale:{mode:Phaser.Scale.RESIZE,width:window.innerWidth,height:window.innerHeight},render:{antialias:true,roundPixels:true},scene:ForestScene,audio:{noAudio:true}});
 // Reload recovery is intentionally explicit: it never creates a replacement room silently.
-if(sessionStorage.getItem('forest-token')&&serverURL){const token=sessionStorage.getItem('forest-token')!;void new Client(serverURL).reconnect(token).then(r=>{room=r;bindRoom(r);}).catch(()=>{sessionStorage.removeItem('forest-token');});}
+if(sessionStorage.getItem('forest-token')&&serverURL){const token=sessionStorage.getItem('forest-token')!;void serverConfig.then(()=>multiplayerClient().reconnect(token)).then(r=>{room=r;bindRoom(r);}).catch(()=>{sessionStorage.removeItem('forest-token');});}

@@ -17,3 +17,5 @@ test('connected explorers must reach exit together, disconnected explorer does n
 test('hiding requires a fern patch and incorrect rune does not consume inventory',()=>{const{p,r,c}=fixture();p.x=650;stepPlayer(p,{left:false,right:false,jump:false,hide:true,seq:1},1/30,2,0,false);assert.equal(p.hidden,true);p.x=100;stepPlayer(p,{left:false,right:false,jump:false,hide:true,seq:2},1/30,2,0,false);assert.equal(p.hidden,false);r.game.chapter=4;p.x=3300;r.game.crystals=5;r.rune(c,2);assert.equal(r.game.crystals,5);});
 
 test('unfinished construction does not block collecting its nearby required crystal',()=>{const{r,c,p}=fixture();r.game.chapter=3;r.game.resources=makeResources(3);r.game.wood=8;r.game.crystals=2;p.x=2490;r.interact(c);assert.equal(r.game.crystals,3);assert.equal(r.game.built,false);p.x=2530;r.interact(c);assert.equal(r.game.built,true);});
+
+test('final chapter gathering is safe until the glider is repaired',()=>{const{r,p}=fixture();r.game.chapter=5;p.x=3100;r.tick(.1);assert.equal(r.game.chaseStarted,false);r.game.built=true;r.tick(.1);assert.equal(r.game.chaseStarted,true);assert.ok(r.game.creatureX>2700);});

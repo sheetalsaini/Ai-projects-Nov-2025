@@ -59,10 +59,10 @@ export class ForestRoom extends Room {
    if(!g.campfire)stepPlayer(p,input,dt,g.chapter,g.elapsed,g.built);
    if(input.jump)input.jump=false;
   }
-  if((g.chapter===2||g.chapter===5)&&!g.campfire){
+  if((g.chapter===2||(g.chapter===5&&g.built))&&!g.campfire){
    const ps=Object.values(g.players).filter(p=>p.connected);
-   if(!g.chaseStarted&&ps.some(p=>p.x>400)){g.chaseStarted=true;this.say('Thornback is coming! Keep moving. Ferns are hiding places.');}
-   if(g.chaseStarted){g.chaseTime+=dt;g.creatureX=-300+g.chaseTime*(g.chapter===2?155:130);
+   if(!g.chaseStarted&&ps.some(p=>p.x>(g.chapter===5?3050:400))){g.chaseStarted=true;this.say('Thornback is coming! Keep moving. Ferns are hiding places.');}
+   if(g.chaseStarted){g.chaseTime+=dt;g.creatureX=(g.chapter===2?-300:2780)+g.chaseTime*(g.chapter===2?155:170);
     for(const p of ps)if(!p.hidden&&Math.abs(p.x-g.creatureX)<65){p.x=Math.min(3950,p.x+420);p.y=250;p.vy=-220;this.say(`${p.name} took the express mudslide. Everyone is safe!`);}
     if(g.creatureX>4300){g.creatureX=-500;g.chaseTime=-6;this.say('Thornback got distracted by its own reflection. Keep going!');}
    }
