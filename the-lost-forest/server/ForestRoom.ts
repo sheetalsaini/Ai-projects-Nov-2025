@@ -73,7 +73,9 @@ export class ForestRoom extends Room {
   const g=this.game,p=g.players[c.sessionId];if(!p||g.finished||g.campfire)return;
   const chapter=CHAPTERS[g.chapter-1];
   const atBuild=!!chapter.build&&Math.abs(p.x-chapter.buildX)<130&&!g.built;
-  const resource=!atBuild&&g.resources.find(r=>!r.taken&&Math.hypot(p.x-r.x,p.y-r.y)<100);
+  const cost=requirements(g.chapter);
+  const canBuild=g.wood>=cost.wood&&g.crystals>=cost.crystals&&g.supplies>=cost.supplies;
+  const resource=!(atBuild&&canBuild)&&g.resources.filter(r=>!r.taken&&Math.hypot(p.x-r.x,p.y-r.y)<100).sort((a,b)=>Math.hypot(p.x-a.x,p.y-a.y)-Math.hypot(p.x-b.x,p.y-b.y))[0];
   if(resource){resource.taken=true;if(resource.kind==='wood')g.wood++;if(resource.kind==='crystal')g.crystals++;if(resource.kind==='supply')g.supplies++;this.say(`Shared pack: +1 ${resource.kind}.`);return;}
   if(chapter.build&&Math.abs(p.x-chapter.buildX)<130&&!g.built){
    const req=requirements(g.chapter);
