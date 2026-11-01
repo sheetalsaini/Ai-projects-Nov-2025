@@ -53,3 +53,16 @@ Logic tests position players at objectives to exercise rules; they are not a ful
 
 ## Assets
 Environment, characters and creature artwork are original procedural drawings in the client. No film artwork, characters, names or audio are used. Phaser and Colyseus dependencies retain their upstream licenses. Optional Google Fonts use their original licenses; system font fallbacks are provided.
+
+## Verified submission release
+Public game: https://the-lost-forest-adventure.sheetalsaini.chatgpt.site/
+Multiplayer server: https://the-lost-forest.onrender.com/
+Source: sheetalsaini/Ai-projects-Nov-2025, branch the-lost-forest-release, folder the-lost-forest.
+
+Verified against public hosting: two independent browser sessions join by code, shared inventory and construction, group exit checks, synchronized chapter progression, visible Professor Pebble replies, and browser reload reconnection. A two-client network test passes remote movement, jumping, collection, reconnect and invalid codes. Eight real clients can join; a ninth is rejected.
+
+A complete live five-chapter playthrough passed using only normal input and interaction messages, without admin actions or teleporting. The optimized test run took 126 seconds; this compact release has not been calibrated to the original 20–30 minute human-session target. Physical phone/iPad tests and cross-country latency tests remain unverified.
+
+Eight local automated tests pass. Run the live checks with FOREST_TEST_URL set to the actual backend origin. The optional --use-env-proxy Node flag is appropriate only in environments that require their configured outbound proxy.
+
+Restart-safe Postgres checkpoints are not yet wired in production. The free checkpoint database exists, but DATABASE_URL still needs to be supplied through Render configuration after the owner completes dashboard authentication. Temporary disconnect and browser-reload recovery work while the room server remains alive.

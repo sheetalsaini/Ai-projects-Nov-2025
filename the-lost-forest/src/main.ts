@@ -98,7 +98,7 @@ class ForestScene extends Phaser.Scene {
   const tree=document.createElement('canvas');tree.width=1500;tree.height=900;const t=tree.getContext('2d')!;
   for(let i=0;i<6;i++){const x=i*290+70;t.fillStyle='#061f1a';t.beginPath();t.moveTo(x-75,900);t.quadraticCurveTo(x+15,400,x-10,-50);t.lineTo(x+40,-50);t.quadraticCurveTo(x+30,400,x+90,900);t.fill();t.strokeStyle='#28604a';t.lineWidth=2;t.beginPath();t.moveTo(x+70,0);t.bezierCurveTo(x+150,220,x+30,220,x+140,460);t.stroke();for(let j=0;j<6;j++){t.fillStyle=j%2?'#0d3026':'#08271f';t.beginPath();t.ellipse(x-140+j*55,40+(j%2)*25,135,70,j*.3,0,7);t.fill();}}this.textures.addCanvas('trees',tree);
  }
- resetWorld(){this.lastBuild='';for(const l of this.labels.values())l.destroy();this.labels.clear();this.actorPositions.clear();}
+ resetWorld(){this.cam=0;this.lastBuild='';for(const l of this.labels.values())l.destroy();this.labels.clear();this.actorPositions.clear();}
  label(key:string,text:string,x:number,y:number,color='#dcebd5',size=13){let l=this.labels.get(key);if(!l){l=this.add.text(x,y,text,{fontFamily:'Arial, sans-serif',fontSize:size,color,backgroundColor:'#071d19cc',padding:{x:7,y:4},align:'center'}).setOrigin(.5,1);this.labels.set(key,l);}l.setPosition(x,y).setText(text);return l;}
  drawWorld(){
   const s=state,chapter=s?.chapter||1,g=this.terrain;g.clear();const elapsed=s?.elapsed||0;const built=s?.built||false;
